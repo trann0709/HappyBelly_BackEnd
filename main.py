@@ -1,5 +1,6 @@
 import json
 import os
+import requests
 import psycopg2
 import psycopg2.extras
 from flask import Flask, request, jsonify
