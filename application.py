@@ -1,3 +1,4 @@
+from email.mime import application
 import json
 import os
 import requests
@@ -22,21 +23,21 @@ from flask_cors import CORS
 load_dotenv(dotenv_path="./.env.local")
 
 DEBUG = bool(os.environ.get("DEBUG", True))
-app = Flask(__name__)
-CORS(app, supports_credentials=True)
-app.config["DEBUG"] = DEBUG
-app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
-app.config["JWT_COOKIE_SECURE"] = False
-app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
-jwt = JWTManager(app)
+application = Flask(__name__)
+CORS(application, supports_credentials=True)
+application.config["DEBUG"] = DEBUG
+application.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+application.config["JWT_COOKIE_SECURE"] = False
+application.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
+application.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
+jwt = JWTManager(application)
 
 
 URL = "https://www.themealdb.com/api/json/v1/1/"
 RECIPES_PER_PAGE = 6
 
 
-@app.after_request
+@application.after_request
 def refresh_expiring_jwts(response):
     try:
         exp_timestamp = get_jwt()["exp"]
@@ -56,7 +57,7 @@ conn = psycopg2.connect(
 )
 
 # USER REGISTRATION
-@app.route("/register", methods=["POST"])
+@application.route("/register", methods=["POST"])
 def register():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
@@ -85,7 +86,7 @@ def register():
 
 
 # LOGIN
-@app.route("/login", methods=["POST"])
+@application.route("/login", methods=["POST"])
 def login():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
@@ -124,7 +125,7 @@ def login():
 
 
 # LOGOUT
-@app.route("/logout", methods=["POST"])
+@application.route("/logout", methods=["POST"])
 def logout():
     response = jsonify({"msg": "logout successful"})
     unset_jwt_cookies(response)
@@ -132,7 +133,7 @@ def logout():
 
 
 # UPDATE USER_INFO
-@app.route("/update_user", methods=["PATCH"])
+@application.route("/update_user", methods=["PATCH"])
 @jwt_required()
 def update_user():
     user_id = get_jwt_identity()
@@ -186,7 +187,7 @@ def update_user():
 
 
 # RESET PASSWORD
-@app.route("/reset_password", methods=["PATCH"])
+@application.route("/reset_password", methods=["PATCH"])
 @jwt_required()
 def reset_password():
     user_id = get_jwt_identity()
@@ -214,7 +215,7 @@ def reset_password():
 
 
 # DELETE USER
-@app.route("/delete_user", methods=["DELETE"])
+@application.route("/delete_user", methods=["DELETE"])
 @jwt_required()
 def delete_user():
     user_id = get_jwt_identity()
@@ -262,7 +263,7 @@ def recipe_format(recipe):
 
 
 # FETCH ALL RECIPES
-@app.route("/recipes", methods=["GET"])
+@application.route("/recipes", methods=["GET"])
 def recipes():
     search = request.args.get("search")
     page = request.args.get("page")
@@ -289,7 +290,7 @@ def recipes():
 
 
 # FETCH SINGLE RECIPE
-@app.route("/recipes/<recipe_id>", methods=["GET"])
+@application.route("/recipes/<recipe_id>", methods=["GET"])
 def single_recipe(recipe_id):
     fetch_url = URL + f"lookup.php?i={recipe_id}"
     print(fetch_url)
@@ -303,7 +304,7 @@ def single_recipe(recipe_id):
 
 
 # ADD FAVORITES
-@app.route("/add_favorite", methods=["POST"])
+@application.route("/add_favorite", methods=["POST"])
 @jwt_required()
 def add_favorite():
     user_id = get_jwt_identity()
@@ -332,7 +333,7 @@ def add_favorite():
 
 
 # REMOVE FAVORITES
-@app.route("/remove_favorite/<id>", methods=["DELETE"])
+@application.route("/remove_favorite/<id>", methods=["DELETE"])
 @jwt_required()
 def remove_favorite(id):
     user_id = get_jwt_identity()
@@ -359,7 +360,7 @@ def remove_favorite(id):
 
 
 # FETCH FAVORITES
-@app.route("/favorite", methods=["GET"])
+@application.route("/favorite", methods=["GET"])
 @jwt_required()
 def fetch_favorites():
     user_id = get_jwt_identity()
@@ -400,7 +401,7 @@ def fetch_favorites():
 
 
 # ADD TO LIST
-@app.route("/add_list", methods=["POST"])
+@application.route("/add_list", methods=["POST"])
 @jwt_required()
 def add_list():
     user_id = get_jwt_identity()
@@ -434,7 +435,7 @@ def add_list():
 
 
 # FETCH LIST
-@app.route("/fetch_list", methods=["GET"])
+@application.route("/fetch_list", methods=["GET"])
 @jwt_required()
 def fetch_list():
     user_id = get_jwt_identity()
@@ -464,7 +465,7 @@ def fetch_list():
 
 
 # DELETE LIST
-@app.route("/delete_list", methods=["DELETE"])
+@application.route("/delete_list", methods=["DELETE"])
 @jwt_required()
 def delete_list():
     user_id = get_jwt_identity()
@@ -480,7 +481,7 @@ def delete_list():
 
 
 # DELETE ITEM
-@app.route("/delete_item", methods=["DELETE"])
+@application.route("/delete_item", methods=["DELETE"])
 @jwt_required()
 def delete_item():
     user_id = get_jwt_identity()
@@ -501,4 +502,4 @@ def delete_item():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050)
+    application.run(host="0.0.0.0", port=5050)
