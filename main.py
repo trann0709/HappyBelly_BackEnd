@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+from dotenv import load_dotenv
 import psycopg2
 import psycopg2.extras
 from flask import Flask, request, jsonify
@@ -18,12 +19,13 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import math
 from flask_cors import CORS
 
+load_dotenv(dotenv_path="./.env.local")
 
 DEBUG = bool(os.environ.get("DEBUG", True))
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.config["DEBUG"] = DEBUG
-app.config["JWT_SECRET_KEY"] = "super-secret"
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 app.config["JWT_COOKIE_SECURE"] = False
 app.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
