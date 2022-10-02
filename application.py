@@ -53,7 +53,10 @@ def refresh_expiring_jwts(response):
 
 # Connect to exisiting database
 conn = psycopg2.connect(
-    database="recipedb", user="docker", password="docker", host="database"
+    database=os.environ["RDS_DB_NAME"],
+    user=os.environ["RDS_USERNAME"],
+    password=os.environ["RDS_PASSWORD"],
+    host=os.environ["RDS_HOSTNAME"],
 )
 
 # USER REGISTRATION
