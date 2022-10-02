@@ -1,4 +1,3 @@
-from email.mime import application
 import json
 import os
 import requests
