@@ -31,6 +31,7 @@ application.config["JWT_TOKEN_LOCATION"] = ["headers", "cookies"]
 application.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=8)
 application.config["JWT_COOKIE_SAMESITE"] = "None"
 application.config["JWT_COOKIE_SECURE"] = True
+application.config["JWT_CSRF_METHODS"] = []
 jwt = JWTManager(application)
 
 
