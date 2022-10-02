@@ -59,7 +59,7 @@ conn = psycopg2.connect(
 )
 
 
-@application.routue("/")
+@application.route("/")
 def health_check():
     return "All good"
 
