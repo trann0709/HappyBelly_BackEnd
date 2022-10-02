@@ -58,6 +58,12 @@ conn = psycopg2.connect(
     host=os.environ["RDS_HOSTNAME"],
 )
 
+
+@application.routue("/")
+def health_check():
+    return "All good"
+
+
 # USER REGISTRATION
 @application.route("/register", methods=["POST"])
 def register():
